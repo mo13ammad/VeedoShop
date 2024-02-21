@@ -1,0 +1,169 @@
+<html>
+<head>
+  <title>استعلام قیمت محصولات</title>
+  <style>
+    /* Set the direction of the text to right-to-left */
+    body {
+      direction: rtl;
+    }
+
+    /* Import the Vazir Font from Google Fonts */
+    @import url('https://fonts.googleapis.com/css?family=Vazir');
+
+    /* Apply the Vazir Font to the body element */
+    body {
+      font-family: 'Vazir', sans-serif; !important
+    }
+
+    /* Set the background image of the body element */
+    body {
+      background-image: url("https://images.unsplash.com/photo-1508615070457-7baeba4003e4?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Ym9va3N8ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60");
+      /* Use the cover value to resize the image to cover the entire container */
+      background-size: cover;
+      /* Use the fixed value to keep the image in place when scrolling */
+      background-attachment: fixed;
+    }
+
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+    }
+    #form {
+  display: flex;
+  align-items: center;
+  margin: 10px;
+  font-family: 'Vazir', sans-serif; !important
+
+}
+
+#search {
+  width: 80%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: 'Vazir', sans-serif; !important
+
+}
+
+#submit {
+  width: 15%;
+  padding: 10px;
+  border: none;
+  background-color: #1c87c9;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: 'Vazir', sans-serif; !important
+
+}
+
+  </style>
+</head>
+<body>
+  <center><h1>استعلام قیمت سرویس مورد نظر</h1></center>
+  <form id="form">
+    <input type="text" id="search" placeholder="اسم بازی یا سرویس خودتون را وارد کنید">
+    <button type="submit" id="submit">جستجو</button>
+  </form>
+  <div id="results"></div>
+  
+  <script>// Make a request to the API using fetch
+    async function fetchData() {
+      try {
+        // Get the query value from the input element
+        let query = document.getElementById("search").value;
+        // Use template literals to create the URL
+        let url = `https://plati.io/api/search.ashx?query=${query}&pagesize=50&pagenum=1&visibleOnly=true&response=json`;
+        // Use await to pause until the promise is resolved
+        let response = await fetch(url);
+        // Use await to pause until the response is parsed
+        let data = await response.json();
+        // Use destructuring to assign values from data to variables
+        let { items, totalpages, totalitems } = data;
+    
+        // Add a variable to store the exchange rate from USD to IRT
+        // Use the value of 60,000 Toman, or 600,000 rials, for each dollar
+        let rate = 60000;
+    
+        // Create a table element to display the data
+        let table = document.createElement("table");
+        // Create a table header row with the column names
+        // Add a new column name for the Buy button and the Description
+        let header = document.createElement("tr");
+        let columns = ["ID", "Name", "Price (IRT)", "Buy", "Description"];
+        for (let column of columns) {
+          let th = document.createElement("th");
+          th.textContent = column;
+          header.appendChild(th);
+        }
+        table.appendChild(header);
+        
+        // Loop through the items array and create a table row for each item
+        for (let item of items) {
+          let row = document.createElement("tr"); 
+          // Loop through the columns and create a table cell for each column
+          for (let column of columns) {
+            let td = document.createElement("td");
+            // Use the column name as the key to access the item property
+            // If the column is price, use the price_usd property and multiply it by the exchange rate
+            // If the column is buy, create a button element and set its href attribute to the given url
+            // If the column is name, use the name_eng property instead of the name property
+            // If the column is description, use the description_eng property to get the item description
+            if (column.toLowerCase() === "price (irt)") {
+              td.textContent = (item["price_usd"] * rate).toFixed(0) + " Toman";
+            } else if (column.toLowerCase() === "buy") {
+              let button = document.createElement("a");
+              button.textContent = "Buy";
+              button.href = "https://zarinp.al/mo13ammad";
+              button.style.display = "block";
+              button.style.width = "100%";
+              button.style.height = "100%";
+              button.style.textAlign = "center";
+              button.style.textDecoration = "none";
+              button.style.color = "white";
+              button.style.backgroundColor = "green";
+              td.appendChild(button);
+            } else if (column.toLowerCase() === "name") {
+              // Use the name_eng property instead of the name property
+              td.textContent = item["name_eng"];
+            
+            } else {
+              td.textContent = item[column.toLowerCase()];
+            }
+            row.appendChild(td);
+          }
+          table.appendChild(row);
+        }
+    
+        // Display the table on the web page
+        let results = document.getElementById("results");
+        // Clear any previous content
+        results.innerHTML = "";
+        results.appendChild(table);
+        
+        // Display some information about the results
+        let info = document.createElement("p");
+        // Use template literals to create the info text content
+        results.appendChild(info);
+      } catch (error) {
+        // Handle any errors
+        console.error(error);
+        let results = document.getElementById("results");
+        results.textContent = "An error occurred while fetching the data.";
+      }
+    }
+    
+    
+    // Attach an event listener to the form element
+    let form = document.getElementById("form");
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      fetchData();
+    });
+    
+  </script>
+</body>
+</html>
