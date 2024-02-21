@@ -126,7 +126,7 @@
             } else if (column.toLowerCase() === "buy") {
               let button = document.createElement("a");
               button.textContent = "Buy";
-              button.href = "https://zarinp.al/mo13ammad";
+              button.href = "https://zarinp.al/mo13ammad?amount="+(item["price_usd"] * rate * 10).toFixed(0) ;
               button.style.display = "block";
               button.style.width = "100%";
               button.style.height = "100%";
